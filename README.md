@@ -8,8 +8,8 @@ running : ./bin/winsvr_adm
 open browser : http://serverip:8080
 
 APIs :
-    http://serverip:8080/status
-    http://serverip:8080/cpu
-    http://serverip:8080/storage
-    http://serverip:8080/net
-    http://serverip:8080/process
+ 1.   http://serverip:8080/status
+ 2.   http://serverip:8080/cpu
+ 3.   http://serverip:8080/storage
+ 4.   http://serverip:8080/net
+ 5.   http://serverip:8080/process
