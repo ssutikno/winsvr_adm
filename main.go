@@ -100,10 +100,24 @@ func storageUsage(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(usageStats)
 }
 
+// write memory usage function and return json
+func memoryUsage(w http.ResponseWriter, r *http.Request) {
+	// prepare the variable
+	var memoryStat *mem.VirtualMemoryStat
+
+	// get memory usage
+	memoryStat, _ = mem.VirtualMemory()
+
+	// return json
+	json.NewEncoder(w).Encode(memoryStat)
+}
+
 func main() {
 	http.HandleFunc("/status", statusHandler)
 	http.HandleFunc("/cpu", cpuUtilization)
 	http.HandleFunc("/network", networkCalculation)
+	http.HandleFunc("/storage", storageUsage)
+	http.HandleFunc("/memory", memoryUsage)
 
 	// serving static files
 	http.Handle("/", http.FileServer(http.Dir("./static")))
