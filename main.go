@@ -13,6 +13,7 @@ import (
 
 	// import modules from the network and storage packages
 	"modules/network"
+	"modules/process"
 	"modules/storage"
 )
 

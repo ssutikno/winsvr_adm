@@ -13,3 +13,8 @@ APIs :
  3.   http://serverip:8080/storage
  4.   http://serverip:8080/net
  5.   http://serverip:8080/process
+
+Future APIs :
+1. list process with percentage
+2. kill, restart process
+3. server reboot
