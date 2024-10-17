@@ -9,39 +9,36 @@ import (
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/mem"
-	"github.com/shirou/gopsutil/v4/process"
+
+	// "github.com/shirou/gopsutil/v4/process"
 
 	// import modules from the network and storage packages
 	"modules/network"
-	"modules/process"
 	"modules/storage"
+	"modules/winprocess"
 )
 
 type ServerStatus struct {
-	CPUUsage     float64             `json:"cpuUsage"`
-	MemoryUsage  float64             `json:"memoryUsage"`
-	Processes    []string            `json:"processes"`
-	Network      []network.NetStats  `json:"network"`
-	StorageUsage []storage.UsageStat `json:"storage"`
+	CPUUsage     float64                  `json:"cpuUsage"`
+	MemoryUsage  float64                  `json:"memoryUsage"`
+	Processes    []winprocess.ProcessInfo `json:"processes"`
+	Network      []network.NetStats       `json:"network"`
+	StorageUsage []storage.UsageStat      `json:"storage"`
 }
 
 func getServerStatus() ServerStatus {
 	cpuPercentages, _ := cpu.Percent(0, false)
 	memoryStat, _ := mem.VirtualMemory()
-	processes, _ := process.Processes()
+	processes, _ := winprocess.GetProcesses()
 	networkStats, _ := network.GetNetworkUtilization()
 	storageStats, _ := storage.GetStorageUsage()
 
-	var processList []string
+	// convert the process list to the correct type
+	var processList []winprocess.ProcessInfo
 	for _, p := range processes {
-		name, _ := p.Name()
-		// append process name to the list if not empty
-		if name != "" {
-			processList = append(processList, name)
-		}
-
-		//  processList = append(processList, name)
+		processList = append(processList, *p)
 	}
+
 	return ServerStatus{
 		CPUUsage:     cpuPercentages[0],
 		MemoryUsage:  memoryStat.UsedPercent,
@@ -113,12 +110,24 @@ func memoryUsage(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(memoryStat)
 }
 
+func processHandler(w http.ResponseWriter, r *http.Request) {
+	// prepare the variable
+	var processes []*winprocess.ProcessInfo
+
+	// get processes
+	processes, _ = winprocess.GetProcesses()
+
+	// return json
+	json.NewEncoder(w).Encode(processes)
+}
+
 func main() {
 	http.HandleFunc("/status", statusHandler)
 	http.HandleFunc("/cpu", cpuUtilization)
 	http.HandleFunc("/network", networkCalculation)
 	http.HandleFunc("/storage", storageUsage)
 	http.HandleFunc("/memory", memoryUsage)
+	http.HandleFunc("/processes", processHandler)
 
 	// serving static files
 	http.Handle("/", http.FileServer(http.Dir("./static")))

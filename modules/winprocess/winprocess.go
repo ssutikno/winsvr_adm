@@ -1,4 +1,4 @@
-package process
+package winprocess
 
 import (
 	"fmt"
@@ -9,12 +9,13 @@ import (
 
 // ProcessInfo represents information about a process.
 type ProcessInfo struct {
-	PID        int32     `json:"pid"`
-	Name       string    `json:"name"`
-	CPUPercent float64   `json:"cpu_percent"`
-	Memory     float32   `json:"memory_percent"`
-	Status     string    `json:"status"`
-	CreateTime time.Time `json:"create_time"`
+	PID             int32     `json:"pid"`
+	Name            string    `json:"name"`
+	CPUPercent      float64   `json:"cpu_percent"`
+	Memory          float32   `json:"memory_percent"`
+	Status          string    `json:"status"`
+	CreateTime      time.Time `json:"create_time"`
+	Executeablepath string    `json:"executeable"`
 }
 
 // GetProcesses returns a list of all running processes with their information.
@@ -55,9 +56,14 @@ func getProcessInfo(p *process.Process) (*ProcessInfo, error) {
 		return nil, fmt.Errorf("failed to get memory percent: %w", err)
 	}
 
-	status, err := p.Status()
+	statusSlice, err := p.Status()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get process status: %w", err)
+	}
+
+	status := ""
+	if len(statusSlice) > 0 {
+		status = statusSlice[0]
 	}
 
 	createTime, err := p.CreateTime()
@@ -100,21 +106,21 @@ func RestartProcess(pid int32) error {
 		return fmt.Errorf("failed to find process with PID %d: %w", pid, err)
 	}
 
-	name, err := p.Name()
-	if err != nil {
-		return fmt.Errorf("failed to get process name: %w", err)
-	}
+	// name, err := p.Name()
+	// if err != nil {
+	// 	return fmt.Errorf("failed to get process name: %w", err)
+	// }
 
 	err = p.Kill()
 	if err != nil {
 		return fmt.Errorf("failed to kill process: %w", err)
 	}
 
-	// This is a simplified restart. Replace with your actual restart logic.
-	_, err = process.NewProcess(0).Cmd().Output() // Replace with actual command to start the process
-	if err != nil {
-		return fmt.Errorf("failed to restart process: %w", err)
-	}
+	// restart the process
+	// _, err = process.NewProcess(0).Cmd().Output() // Replace with actual command to start the process
+	// if err != nil {
+	// 	return fmt.Errorf("failed to restart process: %w", err)
+	// }
 
 	return nil
 }

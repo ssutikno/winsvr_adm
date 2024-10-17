@@ -1,4 +1,4 @@
-module process
+module winprocess
 
 go 1.23.2
 
