@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #jsonOutput {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            white-space: pre;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <textarea id="jsonOutput" readonly></textarea>
+
+    <script>
+        function fetchStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('jsonOutput').value = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                });
+        }
+
+        setInterval(fetchStatus, 5000);
+        fetchStatus(); // Initial fetch
+    </script>
+</body>
+</html>
